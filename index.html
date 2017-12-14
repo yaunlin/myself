@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>360图片拖拽效果</title>
+			<style type="text/css">
+				* {margin: 0px;padding: 0px;}
+				#perspective {width:660px;height:422px;
+                position: absolute;top: 200px;left:200px;
+				border: 2px solid salmon;
+				position: relative;}
+				
+				.content {width:660px;height:420px;float:left;
+				position:absolute;top:55px;left:0px;
+				list-style: none;
+				border: 1px solid blueviolet;
+				border-radius: 10px;
+				}
+				.content img {width:200px;height:120px;border-radius: 10px;}
+			</style>
+			<!--
+				1.1图片要可移动
+				1.2获取鼠标点击时的事件
+				1.3获取位置
+				1.4碰撞事件
+				1.5替换图片
+				
+			-->
+	</head>
+	<body>
+		<div id="perspective">
+		<div class="content" id="wrap">
+			<img src="1.jpg" />
+			<img src="2.jpg" />
+		    <img src="3.jpg" />
+			<img src="4.jpg" />
+			<img src="5.jpg" />
+			<img src="6.jpg" />
+			<img src="7.jpg" />
+			<img src="8.jpg" />
+			<img src="9.jpg" />
+		</div>
+		</div>
+		<script type="text/javascript">
+			 window.onload =function(){
+var wrapDom = document.querySelector("#wrap"); //获取wrap
+var imgDom = document.getElementsByTagName("#img");//获取wrapimg
+var wrap = document.getElementById('wrap');
+var len = imgDom.length;//获取img的长度
+var imgDeg = 360/len; //平分360度
+for(var i=0;i<len;i++){  //分别赋值每个img一个rotateY(沿Y轴转动)和translateZ(偏移位置)
+imgDom[i].style.transform= "rotateY("+i*imgDeg+"deg) translateZ(0px)";
+imgDom[i].style.transition ="transform 1s "+(len-1-i)*0.2+"s";
+}
+var lastx,lasty,nowx,nowy,changeX,changeY,roX=-10;roY=0; //初始化新旧鼠标坐标 每次改变坐标大小 和rotateX和rotateY初始值
+
+
+center(); //执行函数
+window.onresize =center;//当缩放窗口时调用函数
+function center(){ // 垂直居中啊
+var mt = window.innerHeight/2-wrapDom.offsetHeight;  //获取窗口高度除以二再减去容器高度=容器顶距窗口顶的距离
+wrapDom.style.cssText = "margin-top:"+mt+"px";
+}
+setTimeout(function(){
+wrap.style.backgroundImage = "url(./img/12.jpg)";
+},2000)
+
+
+document.onmousedown = function(e){
+  clearInterval(timer)
+var timer = null;
+var ev = e||window.event;//兼容事件
+lastx = ev.clientX;  //当前鼠标位置
+lasty = ev.clientY;
+this.onmousemove = function(e){
+  
+  clearInterval(timer)
+  var ev = e||window.event;
+  var nowx = ev.clientX; //现在鼠标位置
+  var nowy = ev.clientY;
+  changeX=nowx-lastx;   //x轴变化了多少
+
+  changeY=nowy-lasty;
+//y轴变化了多少
+  roY+=changeX*0.1;
+//调节转的速度
+  roX-=changeY*0.1;
+//调节转的速度
+ 
+  wrapDom.style.transform="rotateX("+roX+"deg) rotateY("+roY+"deg)"; //赋值新的rotateX和rotateY
+  lastx=nowx;  //将旧的数据更新
+  lasty=nowy; //将旧的数据更新
+
+}
+this.onmouseup = function(){
+
+this.onmousemove = null;
+//取消移动事件
+timer=setInterval(function(){
+//设定时器逐渐减小rotateX和rotateY  
+  changeX*=0.95;  //每30毫秒rotateX减少5%
+  changeY*=0.95;
+//每30毫秒rotateY减少5%
+  roY+=changeX*0.2; //调节转的速度
+  roX-=changeY*0.2; //调节转的速度
+  wrapDom.style.transform="rotateX("+roX+"deg) rotateY("+roY+"deg)";//赋值新的rotateX和rotateY
+  
+},30)
+}
+return false; //取消默认事件
+}
+}
+		</script>
+	</body>
+</html>
